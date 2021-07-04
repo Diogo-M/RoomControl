@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+   <meta charset='utf-8'>
+   <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+   <title>Page Title</title>
+   <meta name='viewport' content='width=device-width, initial-scale=1'>
+   <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+   <script src='main.js'></script>
+</head>
+
+<body style="background-color: #2b2b2b;">
+   <h1 style="color: white;">HYYYYY!!!!!</h1>
+
+   <div class="slidecontainer">
+      <b style="color: white;">Red:</b>
+      <input type="range" min="0" max="255" value="0" class="slider" id="redSlider">
+      <a style="color: white;" id="redSliderAmount">0</a>
+      <br />
+      <b style="color: white;">Green:</b>
+      <input type="range" min="0" max="255" value="0" class="slider" id="greenSlider">
+      <a style="color: white;" id="greenSliderAmount">0</a>
+      <br />
+      <b style="color: white;">Blue:</b>
+      <input type="range" min="0" max="255" value="0" class="slider" id="blueSlider">
+      <a style="color: white;" id="blueSliderAmount">0</a>
+      <br />
+      <b style="color: white;">White:</b>
+      <input type="range" min="0" max="255" value="0" class="slider" id="whiteSlider">
+      <a style="color: white;" id="whiteSliderAmount">0</a>
+      <br/>
+      <br/>
+      <input type="checkbox" id="cycleChekbox">
+      <a style="color: white;" id="cycleChekboxText">Cycle colors</a>
+      <input type="checkbox" id="lampCheck">
+      <a style="color: white;" id="lampCheckText">Lamp</a>
+      <br />
+      <b style="color: white;">Speed:</b>
+      <input type="number" id="speedInput">
+      <a style="color: white">(in ms)</a>
+   </div>
+
+   <script src="/socket.io/socket.io.js"></script>
+   <script>
+      var socket = io();
+      socket.on('initialValues', function (val) {
+         redValue.innerHTML = val.red
+         greenValue.innerHTML = val.green
+         blueValue.innerHTML = val.blue
+         whiteValue.innerHTML = val.white
+         redSlider.value  = val.red
+         greenSlider.value  = val.green
+         blueSlider.value  = val.blue
+         whiteSlider.value = val.white
+      });
+
+      var redSlider = document.getElementById("redSlider")
+      var redValue = document.getElementById("redSliderAmount")
+      redValue.innerHTML = redSlider.value
+
+      var greenSlider = document.getElementById("greenSlider")
+      var greenValue = document.getElementById("greenSliderAmount")
+      greenValue.innerHTML = greenSlider.value
+
+      var blueSlider = document.getElementById("blueSlider")
+      var blueValue = document.getElementById("blueSliderAmount")
+      blueValue.innerHTML = blueSlider.value
+
+      var whiteSlider = document.getElementById("whiteSlider")
+      var whiteValue = document.getElementById("whiteSliderAmount")
+      whiteValue.innerHTML = whiteSlider.value
+      
+      var cycleChekbox = document.getElementById("cycleChekbox")
+      var lampCheck = document.getElementById("lampCheck")
+      var speedInput = document.getElementById("speedInput")
+
+
+      redSlider.oninput = function () {
+         redValue.innerHTML = this.value
+         whiteSlider.value = 0
+         whiteValue.innerHTML = 0
+         socket.emit('change',
+            {
+               cycle: false,
+               red: this.value,
+               green: greenSlider.value,
+               blue: blueSlider.value,
+               white: 0
+            }
+         )
+      }
+      greenSlider.oninput = function () {
+         greenValue.innerHTML = this.value
+         whiteSlider.value = 0
+         whiteValue.innerHTML = 0
+         socket.emit('change',
+            {
+               cycle: false,
+               red: redSlider.value,
+               green: this.value,
+               blue: blueSlider.value,
+               white: 0
+            }
+         )
+      }
+      blueSlider.oninput = function () {
+         blueValue.innerHTML = this.value
+         whiteSlider.value = 0
+         whiteValue.innerHTML = 0
+         socket.emit('change',
+            {
+               cycle: false,
+               red: redSlider.value,
+               green: greenSlider.value,
+               blue: this.value,
+               white: 0
+            }
+         )
+      }
+      whiteSlider.oninput = function () {
+         redSlider.value = 0
+         greenSlider.value = 0
+         blueSlider.value = 0
+         redValue.innerHTML = 0
+         greenValue.innerHTML = 0
+         blueValue.innerHTML = 0
+         whiteValue.innerHTML = this.value
+         socket.emit('change',
+            {
+               cycle: false,
+               red: 0,
+               green: 0,
+               blue: 0,
+               white: this.value
+            }
+         )
+      }
+      cycleChekbox.onclick = function () {
+         socket.emit('change',
+            {
+               cycle: this.checked,
+               lamp: lampCheck.checked,
+               speed: speedInput.value,
+               red: redSlider.value,
+               green: greenSlider.value,
+               blue: blueSlider.value,
+               white: whiteSlider.value
+            }
+         )
+      }
+   </script>
+</body>
+
+</html>
